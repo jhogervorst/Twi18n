@@ -1,0 +1,78 @@
+<?php
+
+/*
+ * This file is part of the unofficial Twig TranslationExtension.
+ * URL: http://github.com/jhogervorst/Twig-TranslationExtension
+ * 
+ * This file was part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ * (c) 2012 Jonathan Hogervorst
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+/**
+ * Token Parser for the 'trans' tag.
+ */
+class Twig_TranslationExtension_TokenParser_Trans extends Twig_TokenParser
+{
+    /**
+     * Parses a token and returns a node.
+     *
+     * @param  Twig_Token $token A Twig_Token instance
+     *
+     * @return Twig_NodeInterface A Twig_NodeInterface instance
+     */
+    public function parse(Twig_Token $token)
+    {
+        $lineno = $token->getLine();
+        $stream = $this->parser->getStream();
+
+        $vars = new Twig_Node_Expression_Array(array(), $lineno);
+        $domain = null;//new Twig_Node_Expression_Constant('messages', $lineno);
+        if (!$stream->test(Twig_Token::BLOCK_END_TYPE)) {
+            if ($stream->test('with')) {
+                // {% trans with vars %}
+                $stream->next();
+                $vars = $this->parser->getExpressionParser()->parseExpression();
+            }
+
+            if ($stream->test('from')) {
+                // {% trans from "messages" %}
+                $stream->next();
+                $domain = $this->parser->getExpressionParser()->parseExpression();
+            } elseif (!$stream->test(Twig_Token::BLOCK_END_TYPE)) {
+                throw new Twig_Error_Syntax('Unexpected token. Twig was looking for the "with" or "from" keyword.');
+            }
+        }
+
+        // {% trans %}message{% endtrans %}
+        $stream->expect(Twig_Token::BLOCK_END_TYPE);
+        $body = $this->parser->subparse(array($this, 'decideTransFork'), true);
+
+        if (!$body instanceof Twig_Node_Text && !$body instanceof Twig_Node_Expression) {
+            throw new Twig_Error_Syntax('A message must be a simple text');
+        }
+
+        $stream->expect(Twig_Token::BLOCK_END_TYPE);
+
+        return new Twig_TranslationExtension_Node_Trans($body, $domain, null, $vars, $lineno, $this->getTag());
+    }
+
+    public function decideTransFork($token)
+    {
+        return $token->test(array('endtrans'));
+    }
+
+    /**
+     * Gets the tag name associated with this token parser.
+     *
+     * @return string The tag name
+     */
+    public function getTag()
+    {
+        return 'trans';
+    }
+}
