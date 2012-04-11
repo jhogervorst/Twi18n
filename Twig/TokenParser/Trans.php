@@ -3,7 +3,7 @@
 /*
  * This file is part of the the Twig extension Twi18n.
  * URL: http://github.com/jhogervorst/Twi18n
- * 
+ *
  * This file was part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
@@ -59,7 +59,7 @@ class Twi18n_Twig_TokenParser_Trans extends Twig_TokenParser
 
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
 
-        return new Twi18n_Twig_Node_Trans($body, $domain, null, $vars, $lineno, $this->getTag());
+        return new Twi18n_Twig_Node_Trans($body, $domain, null, null, $vars, $lineno, $this->getTag());
     }
 
     public function decideTransFork($token)

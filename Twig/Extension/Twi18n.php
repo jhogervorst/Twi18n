@@ -3,7 +3,7 @@
 /*
  * This file is part of the the Twig extension Twi18n.
  * URL: http://github.com/jhogervorst/Twi18n
- * 
+ *
  * This file was part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
@@ -63,7 +63,8 @@ class Twi18n_Twig_Extension_Twi18n extends Twig_Extension
     {
         return array(
             'trans' => new Twig_Filter_Method($this, 'trans'),
-            'transchoice' => new Twig_Filter_Method($this, 'transchoice'),
+            'transplural' => new Twig_Filter_Method($this, 'transPlural'),
+            'transchoice' => new Twig_Filter_Method($this, 'transChoice'),
         );
     }
 
@@ -78,8 +79,15 @@ class Twi18n_Twig_Extension_Twi18n extends Twig_Extension
             // {% trans %}Symfony is great!{% endtrans %}
             new Twi18n_Twig_TokenParser_Trans(),
 
+            // {% transplural %}
+            //     There is one apple
+            // {% plural %}
+            //     There are {{ count }} apples
+            // {% endtransplural %}
+            new Twi18n_Twig_TokenParser_TransPlural(),
+
             // {% transchoice count %}
-            //     {0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples
+            //     {0} There are no apples|{1} There is one apple|]1,Inf] There are {{ count }} apples
             // {% endtranschoice %}
             new Twi18n_Twig_TokenParser_TransChoice(),
         );
@@ -98,6 +106,31 @@ class Twi18n_Twig_Extension_Twi18n extends Twig_Extension
     {
         // Get the translated message from gettext
         $message = !empty($domain) ? dgettext($domain, $message) : gettext($message);
+
+        // Fill in the arguments
+        $message = strtr($message, $arguments);
+
+        return $message;
+    }
+
+    /**
+     * Translates the given plural message.
+     *
+     * @param integer $number    The number to use to find the indice of the message
+     * @param string $message1   The singular message id
+     * @param string $message2   The plural message id
+     * @param array  $arguments  An array of parameters for the message
+     * @param string $domain     The domain for the message
+     *
+     * @return string The translated string
+     */
+    public function transPlural($number, $message1, $message2, array $arguments = array(), $domain = null)
+    {
+        // Get the translated message from gettext
+        $message = !empty($domain) ? dngettext($domain, $message1, $message2, abs($number)) : ngettext($message1, $message2, abs($number));
+
+        // Add the specified number to the array of arguments
+        $arguments = array_merge($arguments, array('%count%' => $number));
 
         // Fill in the arguments
         $message = strtr($message, $arguments);

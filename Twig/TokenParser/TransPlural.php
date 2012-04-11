@@ -14,9 +14,9 @@
  */
 
 /**
- * Token Parser for the 'transchoice' tag.
+ * Token Parser for the 'transplural' tag.
  */
-class Twi18n_Twig_TokenParser_TransChoice extends Twi18n_Twig_TokenParser_Trans
+class Twi18n_Twig_TokenParser_TransPlural extends Twi18n_Twig_TokenParser_Trans
 {
     /**
      * Parses a token and returns a node.
@@ -32,9 +32,9 @@ class Twi18n_Twig_TokenParser_TransChoice extends Twi18n_Twig_TokenParser_Trans
 
         $vars = new Twig_Node_Expression_Array(array(), $lineno);
 
-        $count = $this->parser->getExpressionParser()->parseExpression();
-
+        $count = null;
         $domain = null;
+        $plural = null;
 
         if ($stream->test('with')) {
             // {% transchoice count with vars %}
@@ -50,20 +50,38 @@ class Twi18n_Twig_TokenParser_TransChoice extends Twi18n_Twig_TokenParser_Trans
 
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
 
-        $body = $this->parser->subparse(array($this, 'decideTransChoiceFork'), true);
+        $body = $this->parser->subparse(array($this, 'decideTransPluralFork'));
 
         if (!$body instanceof Twig_Node_Text && !$body instanceof Twig_Node_Expression) {
             throw new Twig_Error_Syntax('A message must be a simple text.');
         }
 
+        if ($stream->next()->getValue() !== 'plural') {
+            throw new Twig_Error_Syntax('A plural tag is required.');
+        }
+
+        $count = $this->parser->getExpressionParser()->parseExpression();
+
+        $stream->expect(Twig_Token::BLOCK_END_TYPE);
+        $plural = $this->parser->subparse(array($this, 'decideTransPluralEnd'), true);
+
+        if (!$plural instanceof Twig_Node_Text && !$plural instanceof Twig_Node_Expression) {
+            throw new Twig_Error_Syntax('A message (plural) must be a simple text');
+        }
+
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
 
-        return new Twi18n_Twig_Node_Trans($body, $domain, null, $count, $vars, $lineno, $this->getTag());
+        return new Twi18n_Twig_Node_Trans($body, $domain, $plural, $count, $vars, $lineno, $this->getTag());
     }
 
-    public function decideTransChoiceFork($token)
+    public function decideTransPluralFork($token)
     {
-        return $token->test(array('endtranschoice'));
+        return $token->test(array('plural', 'endtransplural'));
+    }
+
+    public function decideTransPluralEnd($token)
+    {
+        return $token->test(array('endtransplural'));
     }
 
     /**
@@ -73,6 +91,6 @@ class Twi18n_Twig_TokenParser_TransChoice extends Twi18n_Twig_TokenParser_Trans
      */
     public function getTag()
     {
-        return 'transchoice';
+        return 'transplural';
     }
 }

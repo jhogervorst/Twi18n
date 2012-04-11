@@ -15,11 +15,11 @@ You must configure the gettext extension before rendering any internationalized 
     setlocale(LC_ALL, 'nl_NL');
     
     // Specify the location of the translation tables
-    bindtextdomain('myAppPhp', 'path/to/locale/files');
-    bind_textdomain_codeset('myAppPhp', 'UTF-8');
+    bindtextdomain('my_app_domain', 'path/to/locale/files');
+    bind_textdomain_codeset('my_app_domain', 'UTF-8');
     
     // Choose domain
-    textdomain('myAppPhp');
+    textdomain('my_app_domain');
 
 The first step to use Twi18n is to register its autoloader:
 
@@ -28,7 +28,7 @@ The first step to use Twi18n is to register its autoloader:
 
 It's best to do this after registering Twig's autoloader.
 
-The Twi18n extension adds gettext support to Twig. It defines two tag, `trans` and `transchoice`. You need to register this extension before using one of the blocks:
+The Twi18n extension adds gettext support to Twig. It defines three tag, `trans`, `transplural` and `transchoice`. You need to register this extension before using one of the blocks:
 
     $twig->addExtension(new Twi18n_Twig_Extension_Twi18n());
 
@@ -37,33 +37,49 @@ Now you should be ready to go.
 Usage
 -----
 
-Twi18n provides specialized Twig tags (`trans` and `transchoice`) to help with message translation of static blocks of text:
+Twi18n provides specialized Twig tags (`trans`, `transplural` and `transchoice`) to help with message translation of static blocks of text:
 
     {% trans %}Hello %name%{% endtrans %}
+    
+    {% transplural %}
+        There is one apple
+    {% plural count %}
+        There are %count% apples
+    {% endtransplural %}
     
     {% transchoice count %}
         {0} There are no apples|{1} There is one apple|]1,Inf] There are %count% apples
     {% endtranschoice %}
 
-The `transchoice` tag automatically gets the `%count%` variable from the current context and passes it to the translator. This mechanism only works when you use a placeholder following the `%var%` pattern.
+The `transplural` and `transchoice` tags automatically get the `%count%` variable from the current context and pass it to the translator. If you use the `transplural` tag to specify a message for a singular and plural number, PHP's gettext functions will choose which message to use. If you use the `transchoice` tag, this extension will choose which message is used. This mechanism only works when you use a placeholder following the `%var%` pattern.
 
 You can also specify the message domain and pass some additional variables:
 
-    {% trans with {'%name%': 'Fabien'} from "app" %}Hello %name%{% endtrans %}
+    {% trans with {'%name%': 'Jonathan'} from 'my_app_domain' %}Hello %name%{% endtrans %}
     
-    {% transchoice count with {'%name%': 'Fabien'} from "app" %}
-        {0} There is no apples|{1} There is one apple|]1,Inf] There are %count% apples
+    {% transplural with {'%name%': 'Jonathan'} from 'my_app_domain' %}
+        There is one apple, %name%
+    {% plural count %}
+        There are %count% apples, %name%
+    {% endtransplural %}
+    
+    {% transchoice count with {'%name%': 'Jonathan'} from 'my_app_domain' %}
+        {0} There are no apples, %name%|{1} There is one apple, %name%|]1,Inf] There are %count% apples, %name%
     {% endtranschoice %}
 
 The trans and transchoice filters can be used to translate variable texts and complex expressions:
 
     {{ message|trans }}
     
-    {{ message|transchoice(5) }}
+    {{ count|transplural(message_plural, message_singular) }}
     
-    {{ message|trans({'%name%': 'Fabien'}, 'app') }}
+    {{ message|transchoice(count) }}
     
-    {{ message|transchoice(5, {'%name%': 'Fabien'}, 'app') }}
+    {{ message|trans({'%name%': 'Jonathan'}, 'my_app_domain') }}
+    
+    {{ count|transplural(message_plural, message_singular, {'%name%': 'Jonathan'}, 'my_app_domain') }}
+    
+    {{ message|transchoice(count, {'%name%': 'Jonathan'}, 'my_app_domain') }}
 
 Learn more
 ----------

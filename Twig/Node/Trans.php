@@ -3,7 +3,7 @@
 /*
  * This file is part of the the Twig extension Twi18n.
  * URL: http://github.com/jhogervorst/Twi18n
- * 
+ *
  * This file was part of the Symfony package.
  *
  * (c) Fabien Potencier <fabien@symfony.com>
@@ -14,9 +14,9 @@
  */
 class Twi18n_Twig_Node_Trans extends Twig_Node
 {
-    public function __construct(Twig_NodeInterface $body, Twig_NodeInterface $domain = null, Twig_Node_Expression $count = null, Twig_Node_Expression $vars = null, $lineno = 0, $tag = null)
+    public function __construct(Twig_NodeInterface $body, Twig_NodeInterface $domain = null, Twig_NodeInterface $plural = null, Twig_Node_Expression $count = null, Twig_Node_Expression $vars = null, $lineno = 0, $tag = null)
     {
-        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'vars' => $vars), array(), $lineno, $tag);
+        parent::__construct(array('count' => $count, 'body' => $body, 'domain' => $domain, 'plural' => $plural, 'vars' => $vars), array(), $lineno, $tag);
     }
 
     /**
@@ -36,17 +36,32 @@ class Twi18n_Twig_Node_Trans extends Twig_Node
         }
         list($msg, $defaults) = $this->compileString($this->getNode('body'), $defaults);
 
-        $method = null === $this->getNode('count') ? 'trans' : 'transChoice';
+        $method = $this->getNode('plural') ? 'transPlural' : ($this->getNode('count') ? 'transChoice' : 'trans');
 
         $compiler
             ->write('echo $this->env->getExtension(\'translator\')->'.$method.'(')
-            ->subcompile($msg)
         ;
 
-        $compiler->raw(', ');
-
-        if (null !== $this->getNode('count')) {
+        if ($method == 'trans') {
             $compiler
+                ->subcompile($msg)
+                ->raw(', ')
+            ;
+        } elseif ($method == 'transPlural') {
+            list($plural) = $this->compileString($this->getNode('plural'), $defaults);
+
+            $compiler
+                ->subcompile($this->getNode('count'))
+                ->raw(', ')
+                ->subcompile($msg)
+                ->raw(', ')
+                ->subcompile($plural)
+                ->raw(', ')
+            ;
+        } elseif ($method == 'transChoice') {
+            $compiler
+                ->subcompile($msg)
+                ->raw(', ')
                 ->subcompile($this->getNode('count'))
                 ->raw(', ')
             ;
