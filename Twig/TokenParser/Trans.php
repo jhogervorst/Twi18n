@@ -31,7 +31,8 @@ class Twi18n_Twig_TokenParser_Trans extends Twig_TokenParser
         $stream = $this->parser->getStream();
 
         $vars = new Twig_Node_Expression_Array(array(), $lineno);
-        $domain = null;//new Twig_Node_Expression_Constant('messages', $lineno);
+        $domain = null;
+
         if (!$stream->test(Twig_Token::BLOCK_END_TYPE)) {
             if ($stream->test('with')) {
                 // {% trans with vars %}
