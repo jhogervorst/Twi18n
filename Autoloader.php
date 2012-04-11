@@ -1,8 +1,8 @@
 <?php
 
 /*
- * This file is part of the unofficial Twig TranslationExtension.
- * URL: http://github.com/jhogervorst/Twig-TranslationExtension
+ * This file is part of the the Twig extension Twi18n.
+ * URL: http://github.com/jhogervorst/Twi18n
  * 
  * This file was part of Twig.
  *
@@ -16,7 +16,7 @@
 /**
  * Autoloads Twig TranslationExtension classes.
  */
-class Twig_TranslationExtension_Autoloader
+class Twi18n_Autoloader
 {
     /**
      * Registers Twig_TranslationExtension_Autoloader as an SPL autoloader.
@@ -36,11 +36,11 @@ class Twig_TranslationExtension_Autoloader
      */
     static public function autoload($class)
     {
-        if (0 !== strpos($class, 'Twig_TranslationExtension')) {
+        if (0 !== strpos($class, 'Twi18n')) {
             return;
         }
 
-        if (file_exists($file = dirname(__FILE__).'/../../'.str_replace('_', '/', $class).'.php')) {
+        if (file_exists($file = dirname(__FILE__).'/../'.str_replace('_', '/', $class).'.php')) {
             require $file;
         }
     }

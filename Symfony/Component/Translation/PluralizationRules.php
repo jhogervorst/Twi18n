@@ -1,8 +1,8 @@
 <?php
 
 /*
- * This file is part of the unofficial Twig TranslationExtension.
- * URL: http://github.com/jhogervorst/Twig-TranslationExtension
+ * This file is part of the the Twig extension Twi18n.
+ * URL: http://github.com/jhogervorst/Twi18n
  * 
  * This file was part of the Symfony package.
  *
@@ -16,7 +16,7 @@
 /**
  * Returns the plural rules for a given locale.
  */
-class Twig_TranslationExtension_SymfonyComponents_Translation_PluralizationRules
+class Twi18n_Symfony_Component_Translation_PluralizationRules
 {
     // @codeCoverageIgnoreStart
     static private $rules = array();

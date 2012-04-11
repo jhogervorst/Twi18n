@@ -1,8 +1,8 @@
 <?php
 
 /*
- * This file is part of the unofficial Twig TranslationExtension.
- * URL: http://github.com/jhogervorst/Twig-TranslationExtension
+ * This file is part of the the Twig extension Twi18n.
+ * URL: http://github.com/jhogervorst/Twi18n
  * 
  * This file was part of the Symfony package.
  *
@@ -12,7 +12,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-class Twig_TranslationExtension_SymfonyComponents_Translation_MessageSelector
+class Twi18n_Symfony_Component_Translation_MessageSelector
 {
     /**
      * Given a message with different plural translations separated by a
@@ -48,7 +48,7 @@ class Twig_TranslationExtension_SymfonyComponents_Translation_MessageSelector
         foreach ($parts as $part) {
             $part = trim($part);
 
-            if (preg_match('/^(?P<interval>'.Twig_TranslationExtension_SymfonyComponents_Translation_Interval::getIntervalRegexp().')\s*(?P<message>.*?)$/x', $part, $matches)) {
+            if (preg_match('/^(?P<interval>'.Twi18n_Symfony_Component_Translation_Interval::getIntervalRegexp().')\s*(?P<message>.*?)$/x', $part, $matches)) {
                 $explicitRules[$matches['interval']] = $matches['message'];
             } elseif (preg_match('/^\w+\:\s*(.*?)$/', $part, $matches)) {
                 $standardRules[] = $matches[1];
@@ -59,12 +59,12 @@ class Twig_TranslationExtension_SymfonyComponents_Translation_MessageSelector
 
         // try to match an explicit rule, then fallback to the standard ones
         foreach ($explicitRules as $interval => $m) {
-            if (Twig_TranslationExtension_SymfonyComponents_Translation_Interval::test($number, $interval)) {
+            if (Twi18n_Symfony_Component_Translation_Interval::test($number, $interval)) {
                 return $m;
             }
         }
 
-        $position = Twig_TranslationExtension_SymfonyComponents_Translation_PluralizationRules::get($number, $locale);
+        $position = Twi18n_Symfony_Component_Translation_PluralizationRules::get($number, $locale);
         if (!isset($standardRules[$position])) {
             throw new Twig_Error_Runtime('Unable to choose a translation.');
         }

@@ -1,8 +1,8 @@
 <?php
 
 /*
- * This file is part of the unofficial Twig TranslationExtension.
- * URL: http://github.com/jhogervorst/Twig-TranslationExtension
+ * This file is part of the the Twig extension Twi18n.
+ * URL: http://github.com/jhogervorst/Twi18n
  * 
  * This file was part of the Symfony package.
  *
@@ -33,7 +33,7 @@
  *
  * @see    http://en.wikipedia.org/wiki/Interval_%28mathematics%29#The_ISO_notation
  */
-class Twig_TranslationExtension_SymfonyComponents_Translation_Interval
+class Twi18n_Symfony_Component_Translation_Interval
 {
     /**
      * Tests if the given number is in the math interval.

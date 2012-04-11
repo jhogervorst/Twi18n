@@ -1,8 +1,8 @@
 <?php
 
 /*
- * This file is part of the unofficial Twig TranslationExtension.
- * URL: http://github.com/jhogervorst/Twig-TranslationExtension
+ * This file is part of the the Twig extension Twi18n.
+ * URL: http://github.com/jhogervorst/Twi18n
  * 
  * This file was part of the Symfony package.
  *
@@ -12,7 +12,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-class Twig_TranslationExtension_Node_Trans extends Twig_Node
+class Twi18n_Twig_Node_Trans extends Twig_Node
 {
     public function __construct(Twig_NodeInterface $body, Twig_NodeInterface $domain = null, Twig_Node_Expression $count = null, Twig_Node_Expression $vars = null, $lineno = 0, $tag = null)
     {

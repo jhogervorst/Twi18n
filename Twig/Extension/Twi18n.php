@@ -1,8 +1,8 @@
 <?php
 
 /*
- * This file is part of the unofficial Twig TranslationExtension.
- * URL: http://github.com/jhogervorst/Twig-TranslationExtension
+ * This file is part of the the Twig extension Twi18n.
+ * URL: http://github.com/jhogervorst/Twi18n
  * 
  * This file was part of the Symfony package.
  *
@@ -16,7 +16,7 @@
 /**
  * Provides integration of the Translation component with Twig.
  */
-class Twig_TranslationExtension_Extension_TranslationExtension extends Twig_Extension
+class Twi18n_Twig_Extension_Twi18n extends Twig_Extension
 {
     protected $locale;
     private $selector;
@@ -24,17 +24,34 @@ class Twig_TranslationExtension_Extension_TranslationExtension extends Twig_Exte
     /**
      * Constructor.
      *
-     * @param string          $locale   The locale
+     * @param string $localeThe locale
      */
     public function __construct($locale = null)
     {
-        if (empty($locale)) {
-            // Get the current locale
-            $locale = setlocale(LC_MESSAGES, '0');
-        }
-
         $this->locale = $locale;
-        $this->selector = new Twig_TranslationExtension_SymfonyComponents_Translation_MessageSelector();
+        $this->selector = new Twi18n_Symfony_Component_Translation_MessageSelector();
+    }
+
+    /**
+     * Set the locale.
+     *
+     * @param string $locale The locale
+     */
+    public function setLocale($locale = null)
+    {
+        $this->locale = $locale;
+    }
+
+    /**
+     * Get the locale.
+     *
+     * @param bool $use_global Use PHP's global locale when no locale is set (default: false).
+     *
+     * @return string The locale
+     */
+    public function getLocale($use_global = false)
+    {
+        return !empty($this->locale) ? $this->locale : setlocale(LC_MESSAGES, '0');
     }
 
     /**
@@ -59,12 +76,12 @@ class Twig_TranslationExtension_Extension_TranslationExtension extends Twig_Exte
     {
         return array(
             // {% trans %}Symfony is great!{% endtrans %}
-            new Twig_TranslationExtension_TokenParser_Trans(),
+            new Twi18n_Twig_TokenParser_Trans(),
 
             // {% transchoice count %}
             //     {0} There is no apples|{1} There is one apple|]1,Inf] There is {{ count }} apples
             // {% endtranschoice %}
-            new Twig_TranslationExtension_TokenParser_TransChoice(),
+            new Twi18n_Twig_TokenParser_TransChoice(),
         );
     }
 
@@ -104,7 +121,7 @@ class Twig_TranslationExtension_Extension_TranslationExtension extends Twig_Exte
         $message = !empty($domain) ? dgettext($domain, $message) : gettext($message);
 
         // Pick the right text for the current count
-        $message = $this->selector->choose($message, (int) $number, $this->locale);
+        $message = $this->selector->choose($message, (int) $number, $this->getLocale(true));
 
         // Add the specified number to the array of arguments
         $arguments = array_merge($arguments, array('%count%' => $number));

@@ -1,8 +1,8 @@
 <?php
 
 /*
- * This file is part of the unofficial Twig TranslationExtension.
- * URL: http://github.com/jhogervorst/Twig-TranslationExtension
+ * This file is part of the the Twig extension Twi18n.
+ * URL: http://github.com/jhogervorst/Twi18n
  * 
  * This file was part of the Symfony package.
  *
@@ -16,7 +16,7 @@
 /**
  * Token Parser for the 'transchoice' tag.
  */
-class Twig_TranslationExtension_TokenParser_TransChoice extends Twig_TranslationExtension_TokenParser_Trans
+class Twi18n_Twig_TokenParser_TransChoice extends Twi18n_Twig_TokenParser_Trans
 {
     /**
      * Parses a token and returns a node.
@@ -58,7 +58,7 @@ class Twig_TranslationExtension_TokenParser_TransChoice extends Twig_Translation
 
         $stream->expect(Twig_Token::BLOCK_END_TYPE);
 
-        return new Twig_TranslationExtension_Node_Trans($body, $domain, $count, $vars, $lineno, $this->getTag());
+        return new Twi18n_Twig_Node_Trans($body, $domain, $count, $vars, $lineno, $this->getTag());
     }
 
     public function decideTransChoiceFork($token)
